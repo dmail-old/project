@@ -1,9 +1,4 @@
-ENV.config('@dmail/*', {
-	path: module.dirname + '/modules/*/index.js',
-	repository: 'https://github.com/dmail/*.git'
-});
-
-// maintenant qu'on a set notre environnement on peut démarrer le fichier que l'on souhaite
+include('config');
 
 ENV.include('@dmail/manage').then(function(manage){
 	//manage('server');
