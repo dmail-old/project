@@ -1,4 +1,7 @@
 ENV.config("@dmail/*", {
 	"path": "./modules/*/index.js",
-	"registry": "git+https://github.com/dmail/*.git"// can be file:// (symlinked), or an URL
+	"registry": "git+https://github.com/dmail/*.git",// also support file://, http(s)://
+	"registryBase": "../modules"
 });
+
+// faudrait autre chose pour choisir où le registre git+https met ses modules (par défaut dans modules parent)
