@@ -1,7 +1,5 @@
-include('config');
-
-ENV.include('@dmail/argv').then(function(manage){
-	//manage('server');
+ENV.include('dmail/argv').then(function(manage){
+	console.log('hereeeee');
 }, function(error){
 	console.log(error.stack);
 });
