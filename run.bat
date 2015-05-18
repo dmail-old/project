@@ -1,2 +1,2 @@
-node ../node_modules/env index
+node ../env index
 pause
