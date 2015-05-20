@@ -1,5 +1,6 @@
 ENV.mainModule = 'index';
 ENV.baseURL = new URI('./', ENV.baseURI);
+ENV.files.push('./local.env.js');
 
 ENV.config('github://*', {
 	"path": "modules/github/*"
@@ -16,5 +17,9 @@ ENV.config('dmail/*', {
 /*
 ENV.config('dmail/argv', {
 	"main": "core.js"
+});
+
+ENV.config('dmail/{name}', {
+	"path": "modules/github/dmail/{name}"
 });
 */
