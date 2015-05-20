@@ -1,4 +1,4 @@
-ENV.mainModule = 'index';
+ENV.mainModule = 'main';
 ENV.baseURL = new URI('./', ENV.baseURI);
 ENV.files.push('./local.env.js');
 
