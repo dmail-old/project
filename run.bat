@@ -1,2 +1,2 @@
-node ../env index
+node ../jsenv/bin start
 pause
