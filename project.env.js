@@ -1,20 +1,16 @@
-ENV.mainModule = 'main';
-ENV.baseURL = './';
-ENV.need('./local.env.js');
+jsenv.mainModule = './main';
+jsenv.baseURL = './';
+jsenv.need('./local.env.js');
 
-// https://github.com/systemjs/systemjs/blob/5ed14adca58abd3cf6c29783abd53af00b0c5bff/lib/package.js#L80
-ENV.config('dmail/*', {
+jsenv.loader.rule('dmail/argv', {
 	// "dependencies": ["", ""], // be carefull, setting dependencies here will prevent auto dependency check
-	"alias": "github://dmail@*"
+	to: 'modules/github/dmail/argv/index.js',
+	from: 'github://dmail@argv/index.js'
 });
 
-ENV.config('github://*', {
-	"main": "index.js",
-	"path": "modules/github/*"
-});
-
-ENV.config('github://dmail@*', {
-	"origin": "github://dmail@*"
+jsenv.loader.rule('dmail/argv/prepare', {
+	to: 'modules/github/dmail/argv/prepare.js',
+	from: 'github://dmail@argv/prepare.js'
 });
 
 /*
