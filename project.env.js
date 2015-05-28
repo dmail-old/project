@@ -8,9 +8,9 @@ jsenv.loader.rule('dmail/argv', {
 	from: 'github://dmail@argv/index.js'
 });
 
-jsenv.loader.rule('dmail/argv/prepare', {
-	to: 'modules/github/dmail/argv/prepare.js',
-	from: 'github://dmail@argv/prepare.js'
+jsenv.loader.rule('dmail/argv/parse', {
+	to: 'modules/github/dmail/argv/parse.js',
+	from: 'github://dmail@argv/parse.js'
 });
 
 /*
