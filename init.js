@@ -41,7 +41,11 @@ if( !fs.existsSync(globalDmailFolder) ){
 	'object-assign',
 	'object-define',
 	'object-merge',
-	'object-clone'
+	'object-clone',
+	'emitter',
+	'notifier',
+	'file-observer',
+	'property'
 ].forEach(function(repo){
 	var directory = path.join(globalDmailFolder, repo);
 	cloneRepository(directory, 'https://github.com/dmail/' + repo);
