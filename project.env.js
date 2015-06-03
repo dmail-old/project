@@ -1,3 +1,4 @@
+jsenv.mode = 'install';
 jsenv.mainModule = './main';
 jsenv.baseURL = './';
 jsenv.need('./local.env.js');
