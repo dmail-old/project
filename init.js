@@ -1,9 +1,11 @@
 /*
-Ceci devrait passer dans jsenv en mode install au lieu de fetch origin
-on fait un git clone
+ces règles s'appliquent en mode install lorsque platform est node et qu'on a un 404
+comment savori le repo que l'on doit cloner pour 'dmail/argv/index.js' ou 'dmail/argv/test/ok.js'
+on fera ça plu stard puisque c'est un cas particulier, en attendant on reste dans ce mode de fonctionnement
 
 jsenv.rule('dmail', {
 	install: 'git' // clone depuis git au lieu de read origin et write source
+	link: '../dmail' // symlink vers '../dmail'
 });
 */
 
@@ -14,13 +16,6 @@ var cwd = process.cwd();
 var child_process = require('child_process');
 var globalDmailFolder = path.resolve(cwd, '../dmail');
 var localDmailFolder = path.resolve(cwd, 'modules/github/dmail');
-
-function link(source, destination){
-	console.log('symlink', source, destination);
-	symlink(source, destination).catch(function(error){
-		console.log(error.stack);
-	});
-}
 
 function cloneRepository(dir, url){
 	if( fs.existsSync(dir) ){
@@ -42,8 +37,16 @@ if( !fs.existsSync(globalDmailFolder) ){
 // git clone
 [
 	'argv',
+	'proto',
+	'object-assign',
+	'object-define',
+	'object-merge',
+	'object-clone'
 ].forEach(function(repo){
-	cloneRepository(path.join(globalDmailFolder, repo), 'https://github.com/dmail/' + repo);
+	var directory = path.join(globalDmailFolder, repo);
+	cloneRepository(directory, 'https://github.com/dmail/' + repo);
+
+	symlink(directory, path.join(localDmailFolder, repo)).catch(function(error){
+		console.log(error.stack);
+	});
 });
-// link folder
-link(globalDmailFolder, localDmailFolder);
