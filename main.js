@@ -1,3 +1,6 @@
+var manage = include('dmail/manage');
+
+/*
 jsenv.include('dmail/argv').then(function(manage){
 	console.log('hereeeee');
 }, function(error){
@@ -5,3 +8,4 @@ jsenv.include('dmail/argv').then(function(manage){
 		throw error;
 	});
 });
+*/
