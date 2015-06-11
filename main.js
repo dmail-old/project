@@ -1,4 +1,4 @@
-var manage = include('dmail/manage');
+var manage = include('dmail/argv');
 
 /*
 jsenv.include('dmail/argv').then(function(manage){

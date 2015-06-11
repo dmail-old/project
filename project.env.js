@@ -4,15 +4,28 @@ jsenv.baseURL = './';
 jsenv.need('./local.env.js');
 // jsenv.useLoaders.push('css');
 
-jsenv.rule('dmail/argv', {
-	main: 'index.js',
-	source: 'modules/github/dmail/argv',
-	origin: 'github://dmail@argv'
+[
+	'argv',
+	'emitter',
+	'file-observer',
+	'manage',
+	'notifier',
+	'proto',
+	'object-assign',
+	'object-define',
+	'object-merge',
+	'object-clone',
+	'property'
+].forEach(function(name){
+	jsenv.rule('dmail/' + name, {
+		main: 'index.js',
+		source: 'modules/github/dmail/' + name,
+		origin: 'github://dmail@' + name,
+		gitclone: {
+			from: 'https://github.com/dmail/' + name,
+			to: '../dmail/' + name,
+			link: 'modules/github/dmail/' + name
+		}
+	});
 });
-/*
-jsenv.rule('dmail/manage', {
-	main: 'index.js',
-	source: 'modules/github/dmail/manage',
-	origin: 'github://dmail@manage'
-});
-*/
+
