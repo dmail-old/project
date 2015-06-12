@@ -42,21 +42,7 @@ if( jsenv.platform.type === 'process' ){
 
 		var promise;
 
-		if( jsenv.mode === 'update' ){
-			promise = Promise.all(
-				modules.map(function(name){
-					var repoLocation = getLocation('../dmail/' + name);
-
-					console.log('git pull', repoLocation);
-					return exec('git pull', {
-						cwd: repoLocation
-					}).then(function(){
-						console.log('git pull done');
-					});
-				}, this)
-			);
-		}
-		else if( jsenv.mode === 'install' ){
+		if( jsenv.mode === 'install' ){
 			promise = Promise.all(
 				modules.map(function(name){
 					var from = 'https://github.com/dmail/' + name;
