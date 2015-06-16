@@ -1,0 +1,12 @@
+{
+	"name": "project",
+	"version": "0.0.1",
+	"dependencies": {
+		"jsenv": "*"
+	},
+	"scripts": {
+		"postinstall": "scripts/install.js",
+		"start": "scripts/start.js",
+		"update": "scripts/update.js"
+	}
+}
