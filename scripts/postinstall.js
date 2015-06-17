@@ -48,7 +48,7 @@ promise = promise.then(function(){
 		modules.map(function(name){
 			var from = 'https://github.com/dmail/' + name;
 			var to = '../dmail/' + name;
-			var link = 'modules/github/dmail/' + name;
+			var link = 'modules/dmail/' + name;
 
 			to = getLocation(to);
 

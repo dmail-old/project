@@ -2,10 +2,11 @@
 	"name": "project",
 	"version": "0.0.1",
 	"dependencies": {
-		"jsenv": "*"
+		"jsenv": "git+https://github.com/dmail/jsenv"
 	},
 	"scripts": {
-		"postinstall": "scripts/install.js",
+		"preinstall": "scripts/preinstall.js",
+		"postinstall": "scripts/postinstall.js",
 		"start": "scripts/start.js",
 		"update": "scripts/update.js"
 	}
