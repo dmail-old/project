@@ -5,8 +5,13 @@
 		"jsenv": "git+https://github.com/dmail/jsenv"
 	},
 	"scripts": {
-		"postinstall": "scripts/postinstall.js",
-		"start": "scripts/start.js",
-		"update": "scripts/update.js"
+		"preinstall": "node scripts/preinstall.js",
+		"postinstall": "node scripts/postinstall.js",
+		"start": "node scripts/start.js",
+		"update": "node scripts/update.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dmail/project"
 	}
 }

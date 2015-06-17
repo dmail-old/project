@@ -1,4 +1,4 @@
-//jsenv.mode = jsenv.mode || 'install';
+jsenv.mode = jsenv.mode || 'install';
 jsenv.mainModule = './main';
 jsenv.baseURL = './';
 jsenv.need('./config-project.js');

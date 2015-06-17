@@ -1,14 +1,14 @@
 var filesystem = require('jsenv/utils/filesystem');
 var hasdir = require('jsenv/utils/has-dir');
 var hasfile = require('jsenv/utils/has-file');
-var cloneRepo = require('jsenv/utils/clone-github');
 var symlink = require('jsenv/utils/symlink');
 var exec = require('jsenv/utils/exec');
 var mkdirto = require('jsenv/utils/mkdir-to');
 var path = require('path');
+var cwd = process.cwd();
 
 function getLocation(location){
-	return String(jsenv.loader.resolveURL(location)).slice('file://'.length);
+	return path.resolve(cwd, location);
 }
 
 function cloneRepo(repositoryURL, directory){
