@@ -5,7 +5,6 @@
 		"jsenv": "git+https://github.com/dmail/jsenv"
 	},
 	"scripts": {
-		"preinstall": "scripts/preinstall.js",
 		"postinstall": "scripts/postinstall.js",
 		"start": "scripts/start.js",
 		"update": "scripts/update.js"
