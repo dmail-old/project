@@ -16,6 +16,6 @@ modules.forEach(function(name){
 	jsenv.rule('dmail/' + name, {
 		main: 'index.js',
 		source: 'modules/dmail/' + name,
-		origin: 'github://dmail@' + name
+		origin: '//github.com/dmail/' + name
 	});
 });
