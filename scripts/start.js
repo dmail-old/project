@@ -8,6 +8,7 @@ var http = require('http');
 
 http.createServer(function(clientRequest, serverResponse){
 	if( clientRequest.headers && clientRequest.headers.accept === 'text/event-stream' ){
+		clientRequest.socket.setTimeout(Infinity);
 		serverResponse.writeHead(200, {
 			'content-type': 'text/event-stream',
 			'cache-control': 'no-cache',
@@ -20,18 +21,14 @@ http.createServer(function(clientRequest, serverResponse){
 		var interval = setInterval(function(){
 			serverResponse.write('data: ' + (new Date()) + '\n\n');
 		}, 1000);
-		clientRequest.connection.addListener('close', function(){
+		clientRequest.connection.on('close', function(){
 		  clearInterval(interval);
 		}, false);
 	}
 	else{
 		jsenv.loader.read(clientRequest.url).then(function(response){
-			// il faut set le content-type
-			// response.headers['content-type'] = 'application/javascript';
-
 			serverResponse.writeHead(response.status, response.headers);
-			serverResponse.write(response.body);
-			serverResponse.end();
+			response.body.pipeTo(serverResponse);
 		});
 	}
 }).listen(port, host);

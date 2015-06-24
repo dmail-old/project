@@ -2,7 +2,8 @@
 	"name": "project",
 	"version": "0.0.1",
 	"dependencies": {
-		"jsenv": "git+https://github.com/dmail/jsenv"
+		"jsenv": "git+https://github.com/dmail/jsenv",
+		"@dmail/mimetype": "git+https://github.com/dmail/mimetype"
 	},
 	"scripts": {
 		"preinstall": "node scripts/preinstall.js",
