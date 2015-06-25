@@ -3,7 +3,9 @@
 	"version": "0.0.1",
 	"dependencies": {
 		"jsenv": "git+https://github.com/dmail/jsenv",
-		"@dmail/mimetype": "git+https://github.com/dmail/mimetype"
+		"@dmail/server": "git+https://github.com/dmail/server",
+		"@dmail/mimetype": "git+https://github.com/dmail/mimetype",
+		"@dmail/sse": "git+https://github.com/dmail/sse"
 	},
 	"scripts": {
 		"preinstall": "node scripts/preinstall.js",
