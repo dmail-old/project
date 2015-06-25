@@ -1,7 +1,7 @@
-var Server = require('@dmail/server');
-var sse = require('@dmail/sse');
+var Server = require('../lib/server');
+var sse = require('../lib/sse');
 
-function preparejsenv(){
+function replaceFileSystemByHttpServer(){
 	var serverUrl = 'http://127.0.0.1:8081';
 	var server = Server.create(serverUrl);
 	var filesystemRoom = sse.createRoom();
@@ -44,9 +44,11 @@ function preparejsenv(){
 		console.log('the file', file, 'has been modified');
 	});
 
+	console.log(jsenv.baseURI, '->', serverUrl);
 	jsenv.baseURI = serverUrl;
+	jsenv.loader.baseURL = new URL(jsenv.baseURL, jsenv.baseURI);
 }
 
 require('jsenv');
-jsenv.need(preparejsenv); // preparejsenv before loading index.js
 jsenv.need('./index.js');
+jsenv.ready(replaceFileSystemByHttpServer);
