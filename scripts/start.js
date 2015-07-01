@@ -59,9 +59,16 @@ function replaceFileSystemByHttpServer(){
 				});
 			}
 			else{
-				jsenv.loader.read(clientRequest.url).then(function(response){
+				var moduleLocation = new URL('.' + clientRequest.url, filesystemRoot);
+
+				jsenv.store.read(moduleLocation).then(function(response){
+					console.log(response.status, clientRequest.url);
 					serverResponse.writeHead(response.status, response.headers);
 					response.body.pipeTo(serverResponse);
+				}).catch(function(e){
+					//console.log('error during file response creation', e.stack);
+					serverResponse.writeHead(500);
+					serverResponse.end(e.stack);
 				});
 			}
 		});
