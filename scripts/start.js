@@ -73,5 +73,5 @@ function replaceFileSystemByHttpServer(){
 require('jsenv');
 jsenv.need('./index.js');
 
-jsenv.ready(listenFilesystemEventStream);
+//jsenv.ready(listenFilesystemEventStream);
 jsenv.ready(replaceFileSystemByHttpServer);
