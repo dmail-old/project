@@ -1,5 +1,6 @@
 var Server = require('../lib/server');
 var sse = require('../lib/sse');
+var manage = require('../lib/manage');
 var serverUrl = 'http://127.0.0.1:8081';
 
 function listenFilesystemEventStream(){
