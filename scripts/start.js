@@ -2,7 +2,7 @@ var path = require('path');
 var url = require('url');
 var Server = require('../lib/server');
 var sse = require('../lib/sse');
-var createFileResponse = require('jsenv/storages/storage-file').createResponsePromiseForGet;
+var fileStorage = require('jsenv/storages/storage-file');
 var manage = require('../lib/manage');
 
 var serverURL = 'http://127.0.0.1:8081';
@@ -31,8 +31,6 @@ function createFileSystemServer(serverUrl){
 	});
 
 	server.on('request', function(clientRequest, serverResponse){
-		console.log(clientRequest.method, clientRequest.url);
-
 		if( clientRequest.headers && clientRequest.headers.accept === 'text/event-stream' ){
 			var lastEventId = clientRequest.headers['last-event-id'] || url.parse(clientRequest.url, true).query['lastEventId'];
 
@@ -43,15 +41,51 @@ function createFileSystemServer(serverUrl){
 			});
 		}
 		else{
-			createFileResponse({
-				url: path.resolve(cwd, '.' + url.parse(clientRequest.url).pathname),
-				method: clientRequest.method,
-				headers: clientRequest.headers
-			}).then(function(response){
+			var responsePromise;
+
+			if( clientRequest.method === 'GET' || clientRequest.method === 'HEAD' ){
+				responsePromise = fileStorage.createResponsePromiseForGet({
+					url: path.resolve(cwd, '.' + url.parse(clientRequest.url).pathname),
+					method: clientRequest.method,
+					headers: clientRequest.headers
+				});
+			}
+			else if( clientRequest.method === 'POST' ){
+				responsePromise = fileStorage.createResponsePromiseForSet({
+					url: path.resolve(cwd, '.' + url.parse(clientRequest.url).pathname),
+					method: clientRequest.method,
+					headers: clientRequest.headers,
+					body: {
+						pipeTo: function(writableStream){
+							clientRequest.pipe(writableStream);
+
+							return new Promise(function(resolve, reject){
+								clientRequest.on('error', reject);
+								clientRequest.on('end', resolve);
+							});
+						}
+					}
+				});
+			}
+			else{
+				responsePromise = Promise.resolve({
+					status: 500
+				});
+			}
+
+			responsePromise.then(function(response){
 				serverResponse.writeHead(response.status, response.headers);
 
 				if( response.body ){
-					response.body.pipeTo(serverResponse);
+					if( response.body.pipeTo ){
+						response.body.pipeTo(serverResponse);
+					}
+					else if( response.body.pipe ){
+						response.body.pipe(serverResponse);
+					}
+					else{
+						serverResponse.end(response.body);
+					}
 				}
 				else{
 					serverResponse.end();
@@ -68,7 +102,7 @@ function createFileSystemServer(serverUrl){
 
 var server = createFileSystemServer(serverURL);
 var nodeProcess = manage({
-	path: './lib/decorate.js',
+	path: './index.js',
 	baseURL: serverURL // tell decorate.js the baseURL is the serverURL
 });
 
