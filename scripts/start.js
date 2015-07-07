@@ -4,6 +4,7 @@ var Server = require('../lib/server');
 var sse = require('../lib/sse');
 var fileStorage = require('jsenv/storages/storage-file');
 var Work = require('../lib/work');
+var fileWatcher = require('../lib/fs-watch');
 
 var serverURL = 'http://127.0.0.1:8081';
 
@@ -35,7 +36,7 @@ function createFileSystemServer(serverUrl){
 			var lastEventId = clientRequest.headers['last-event-id'] || url.parse(clientRequest.url, true).query['lastEventId'];
 
 			filesystemRoom.add(serverResponse, lastEventId);
-			clientRequest.socket.setTimeout(Infinity);
+			clientRequest.socket.setNoDelay(true);
 			clientRequest.connection.on('close', function(){
 				filesystemRoom.remove(serverResponse);
 			});
@@ -44,8 +45,14 @@ function createFileSystemServer(serverUrl){
 			var responsePromise;
 
 			if( clientRequest.method === 'GET' || clientRequest.method === 'HEAD' ){
+				var filePath = path.resolve(cwd, '.' + url.parse(clientRequest.url).pathname);
+
+				fileWatcher.watch(filePath, function(filePath){
+					filesystemRoom.sendEvent('change', filePath);
+				});
+
 				responsePromise = fileStorage.createResponsePromiseForGet({
-					url: path.resolve(cwd, '.' + url.parse(clientRequest.url).pathname),
+					url: filePath,
 					method: clientRequest.method,
 					headers: clientRequest.headers
 				});

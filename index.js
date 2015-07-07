@@ -3,16 +3,12 @@ var args = require('./lib/argv').parse(process.argv);
 require('jsenv');
 
 function listenFilesystemEventStream(url){
-	return;
-
 	var source = jsenv.http.createEventSource(url);
 
 	source.on('change', function(e){
 		var file = e.data;
-		console.log('the file', file, 'has been modified');
+		console.log('file modified :', file);
 	});
-
-	console.log('connecting to eventsource :', url);
 }
 
 jsenv.need(function setupBase(){
