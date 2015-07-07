@@ -3,7 +3,7 @@ var url = require('url');
 var Server = require('../lib/server');
 var sse = require('../lib/sse');
 var fileStorage = require('jsenv/storages/storage-file');
-var manage = require('../lib/manage');
+var Work = require('../lib/work');
 
 var serverURL = 'http://127.0.0.1:8081';
 
@@ -101,17 +101,19 @@ function createFileSystemServer(serverUrl){
 }
 
 var server = createFileSystemServer(serverURL);
-var nodeProcess = manage({
-	path: './index.js',
-	baseURL: serverURL // tell decorate.js the baseURL is the serverURL
+var work = Work.create('./index.js', {
+	// tell the baseURL is the serverURL
+	args: {
+		baseURL: serverURL
+	}
 });
 
 server.on('open', function(){
-	nodeProcess.start();
+	work.start();
 });
 
 server.on('close', function(){
-	nodeProcess.stop();
+	work.stop();
 });
 
 server.open();
