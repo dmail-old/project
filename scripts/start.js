@@ -109,7 +109,7 @@ var work = Work.create('./index.js', {
 });
 
 server.on('open', function(){
-	work.start();
+	work.start(server.close.bind(server));
 });
 
 server.on('close', function(){
