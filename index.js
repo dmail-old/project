@@ -8,6 +8,8 @@ function listenFilesystemEventStream(url){
 	source.on('change', function(e){
 		var file = e.data;
 		console.log('file modified :', file);
+
+		jsenv.platform.restart();
 	});
 }
 
