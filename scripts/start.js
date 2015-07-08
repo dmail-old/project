@@ -32,7 +32,8 @@ function createFileSystemServer(serverUrl){
 	});
 
 	server.on('request', function(clientRequest, serverResponse){
-		if( clientRequest.headers && clientRequest.headers.accept === 'text/event-stream' ){
+		if( clientRequest.headers && clientRequest.headers.accept === 'text/event-stream' &&
+			clientRequest.url.indexOf('filesystem-events') !== -1 ){
 			var lastEventId = clientRequest.headers['last-event-id'] || url.parse(clientRequest.url, true).query['lastEventId'];
 
 			filesystemRoom.add(serverResponse, lastEventId);
@@ -47,14 +48,18 @@ function createFileSystemServer(serverUrl){
 			if( clientRequest.method === 'GET' || clientRequest.method === 'HEAD' ){
 				var filePath = path.resolve(cwd, '.' + url.parse(clientRequest.url).pathname);
 
-				fileWatcher.watch(filePath, function(filePath){
-					filesystemRoom.sendEvent('change', filePath);
-				});
-
 				responsePromise = fileStorage.createResponsePromiseForGet({
 					url: filePath,
 					method: clientRequest.method,
 					headers: clientRequest.headers
+				}).then(function(response){
+					// watch only if file exists
+					if( response.status === 200 || response.status === 304 ){
+						fileWatcher.watch(filePath, function(filePath){
+							filesystemRoom.sendEvent('change', filePath);
+						});
+					}
+					return response;
 				});
 			}
 			else if( clientRequest.method === 'POST' ){
