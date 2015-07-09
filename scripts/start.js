@@ -86,7 +86,7 @@ function createFileSystemServer(serverUrl){
 			}
 
 			responsePromise.then(function(response){
-				serverResponse.writeHead(response.status, response.headers);
+				serverResponse.writeHead(response.status, response.headers.toJSON());
 
 				if( response.body ){
 					if( response.body.pipeTo ){
