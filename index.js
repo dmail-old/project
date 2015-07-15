@@ -2,8 +2,17 @@ var args = require('./lib/argv').parse(process.argv);
 
 require('jsenv');
 
-function listenFilesystemEventStream(url){
+function listenFilesystemEventStream(url, next){
 	var source = jsenv.http.createEventSource(url);
+
+	source.on('error', function(e){
+		next(e.data);
+	});
+
+	source.on('open', function(e){
+		console.log('event source connected');
+		next();
+	});
 
 	source.on('change', function(e){
 		var file = e.data;
@@ -22,8 +31,8 @@ jsenv.need('./config-project.js');
 jsenv.need('./config-local.js');
 
 if( args.baseURL ){
-	jsenv.need(function setupDev(){
+	jsenv.need(function setupDev(next){
 		jsenv.baseURL = args.baseURL;
-		listenFilesystemEventStream(jsenv.baseURL + '/filesystem-events.js');
+		listenFilesystemEventStream(jsenv.baseURL + '/filesystem-events.js', next);
 	});
 }

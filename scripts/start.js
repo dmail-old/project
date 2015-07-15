@@ -17,9 +17,11 @@ function createFileSystemServer(serverUrl){
 		console.log('server error :', e);
 	});
 
+	/*
 	server.on('clientError', function(e){
 		console.log('client error :', e);
 	});
+*/
 
 	server.on('open', function(){
 		console.log('server opened :', serverUrl);
@@ -56,6 +58,7 @@ function createFileSystemServer(serverUrl){
 					// watch only if file exists
 					if( response.status === 200 || response.status === 304 ){
 						fileWatcher.watch(filePath, function(filePath){
+							console.log('file modified:', filePath);
 							filesystemRoom.sendEvent('change', filePath);
 						});
 					}
@@ -67,16 +70,7 @@ function createFileSystemServer(serverUrl){
 					url: path.resolve(cwd, '.' + url.parse(clientRequest.url).pathname),
 					method: clientRequest.method,
 					headers: clientRequest.headers,
-					body: {
-						pipeTo: function(writableStream){
-							clientRequest.pipe(writableStream);
-
-							return new Promise(function(resolve, reject){
-								clientRequest.on('error', reject);
-								clientRequest.on('end', resolve);
-							});
-						}
-					}
+					body: clientRequest
 				});
 			}
 			else{
@@ -85,18 +79,18 @@ function createFileSystemServer(serverUrl){
 				});
 			}
 
-			responsePromise.then(function(response){
-				serverResponse.writeHead(response.status, response.headers.toJSON());
+			responsePromise.then(function(responseProperties){
+				serverResponse.writeHead(responseProperties.status, responseProperties.headers);
 
-				if( response.body ){
-					if( response.body.pipeTo ){
-						response.body.pipeTo(serverResponse);
+				if( responseProperties.body ){
+					if( responseProperties.body.pipeTo ){
+						responseProperties.body.pipeTo(serverResponse);
 					}
-					else if( response.body.pipe ){
-						response.body.pipe(serverResponse);
+					else if( responseProperties.body.pipe ){
+						responseProperties.body.pipe(serverResponse);
 					}
 					else{
-						serverResponse.end(response.body);
+						serverResponse.end(responseProperties.body);
 					}
 				}
 				else{
