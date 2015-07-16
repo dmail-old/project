@@ -17,12 +17,6 @@ function createFileSystemServer(serverUrl){
 		console.log('server error :', e);
 	});
 
-	/*
-	server.on('clientError', function(e){
-		console.log('client error :', e);
-	});
-*/
-
 	server.on('open', function(){
 		console.log('server opened :', serverUrl);
 		filesystemRoom.open();
@@ -112,7 +106,7 @@ function createFileSystemServer(serverUrl){
 }
 
 var server = createFileSystemServer(serverURL);
-var work = Work.create('./index.js', {
+var work = Work.create('./index-process.js', {
 	// tell the baseURL is the serverURL
 	args: {
 		baseURL: serverURL
