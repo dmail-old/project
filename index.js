@@ -18,7 +18,17 @@ function listenFilesystemEventStream(url, next){
 		var file = e.data;
 		console.log('file modified :', file);
 
-		jsenv.platform.restart();
+		// faudrais utiliser jsenv.baseURI mais il est préfixe avec file://
+		var normalizedName = require('path').relative(process.cwd(), file);
+
+		if( normalizedName[0] != '/' ) normalizedName = '/' + normalizedName;
+		if( normalizedName[0] != '.' ) normalizedName = '.' + normalizedName;
+
+		// le fichier modifié est bien un module que l'on utilise
+		if( jsenv.loader.has(normalizedName) ){
+			console.log(normalizedName, 'module modified');
+			jsenv.platform.restart();
+		}
 	});
 }
 
@@ -33,6 +43,18 @@ jsenv.need('./config-local.js');
 if( args.baseURL ){
 	jsenv.need(function setupDev(next){
 		jsenv.baseURL = args.baseURL;
+
+		jsenv.onerror = function(error){
+			// because event source is connected, error occuring in watched files does not kill the process
+			// this way the process can still ask to restart
+			if( error.filename && (error.name === 'SyntaxError' || error.name === 'ReferenceError') && this.findModuleByURL(error.filename) ){
+				console.error(error.stack);
+			}
+			else{
+				throw error;
+			}
+		};
+
 		listenFilesystemEventStream(jsenv.baseURL + '/filesystem-events.js', next);
 	});
 }

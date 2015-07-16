@@ -58,7 +58,7 @@ function createFileSystemServer(serverUrl){
 					// watch only if file exists
 					if( response.status === 200 || response.status === 304 ){
 						fileWatcher.watch(filePath, function(filePath){
-							console.log('file modified:', filePath);
+							//console.log('file modified:', filePath);
 							filesystemRoom.sendEvent('change', filePath);
 						});
 					}
