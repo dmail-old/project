@@ -39,6 +39,7 @@ if( args.baseURL ){
 
 		jsenv.onerror = function(error){
 			// because event source is connected, error occuring in watched files does not kill the process
+			// but the promise is still rejected so nothing is supposed to happen
 			// this way the process can still ask to restart
 			if( error.filename && (error.name === 'SyntaxError' || error.name === 'ReferenceError') && this.findModuleByURL(error.filename) ){
 				console.error(error.stack);
