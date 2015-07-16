@@ -60,6 +60,9 @@ function createFileSystemServer(serverUrl){
 
 							filesystemRoom.sendEvent('change', fileName);
 						});
+
+						// chrome is caching file
+						response.headers['cache-control'] = 'no-cache';
 					}
 					return response;
 				});
