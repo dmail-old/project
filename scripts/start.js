@@ -59,7 +59,12 @@ function createFileSystemServer(serverUrl){
 					if( response.status === 200 || response.status === 304 ){
 						fileWatcher.watch(filePath, function(filePath){
 							//console.log('file modified:', filePath);
-							filesystemRoom.sendEvent('change', filePath);
+							var fileName = path.relative(process.cwd(), filePath);
+
+							if( fileName[0] != '/' ) fileName = '/' + fileName;
+							if( fileName[0] != '.' ) fileName = '.' + fileName;
+
+							filesystemRoom.sendEvent('change', fileName);
 						});
 					}
 					return response;

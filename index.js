@@ -16,17 +16,10 @@ function listenFilesystemEventStream(url, next){
 
 	source.on('change', function(e){
 		var file = e.data;
-		console.log('file modified :', file);
-
-		// faudrais utiliser jsenv.baseURI mais il est préfixe avec file://
-		var normalizedName = require('path').relative(process.cwd(), file);
-
-		if( normalizedName[0] != '/' ) normalizedName = '/' + normalizedName;
-		if( normalizedName[0] != '.' ) normalizedName = '.' + normalizedName;
 
 		// le fichier modifié est bien un module que l'on utilise
-		if( jsenv.loader.has(normalizedName) ){
-			console.log(normalizedName, 'module modified');
+		if( jsenv.loader.has(file) ){
+			console.log(file, 'module modified');
 			jsenv.platform.restart();
 		}
 	});
