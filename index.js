@@ -6,7 +6,6 @@ function listenFilesystemEventStream(url, next){
 	});
 
 	source.on('open', function(e){
-		console.log('event source connected');
 		next();
 	});
 
@@ -36,7 +35,21 @@ if( jsenv.server ){
 			// but the promise is still rejected so nothing is supposed to happen
 			// this way the process can still ask to restart
 			if( error.filename && (error.name === 'SyntaxError' || error.name === 'ReferenceError') && this.findModuleByURL(error.filename) ){
-				console.error(error.stack);
+				var stack = error.stack;
+
+				/*
+				stack = stack.replace(/\((.+):([0-9]+):([0-9]+)\)/g, function(match, fileName, lineNumber, columnNumber){
+					var module = jsenv.findModuleBy('address', fileName);
+
+					if( module ){
+						return '(' + fileName + ':' + (parseInt(lineNumber) - 2) + ':' + columnNumber + ')';
+					}
+
+					return match;
+				});
+				*/
+
+				console.error(stack);
 			}
 			else{
 				throw error;

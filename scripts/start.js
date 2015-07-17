@@ -40,7 +40,7 @@ function createFileSystemServer(serverUrl){
 	server.on('request', function(clientRequest, serverResponse){
 		var responsePromise;
 
-		console.log(clientRequest.method, clientRequest.url);
+		//console.log(clientRequest.method, clientRequest.url);
 
 		if( clientRequest.method === 'OPTIONS' ){
 			responsePromise = Promise.resolve({
