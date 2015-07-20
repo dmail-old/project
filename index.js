@@ -1,13 +1,5 @@
-function listenFilesystemEventStream(url, next){
+function listenFilesystemEventStream(url){
 	var source = jsenv.http.createEventSource(url);
-
-	source.on('error', function(e){
-		next(e.data);
-	});
-
-	source.on('open', function(e){
-		next();
-	});
 
 	source.on('change', function(e){
 		var file = e.data;
@@ -29,7 +21,7 @@ jsenv.need('./config-project.js');
 jsenv.need('./config-local.js');
 
 if( jsenv.server ){
-	jsenv.need(function setupDev(next){
+	jsenv.need(function setupDev(){
 		jsenv.onerror = function(error){
 			// because event source is connected, error occuring in watched files does not kill the process
 			// but the promise is still rejected so nothing is supposed to happen
@@ -56,6 +48,6 @@ if( jsenv.server ){
 			}
 		};
 
-		listenFilesystemEventStream(jsenv.baseURL + '/filesystem-events.js', next);
+		listenFilesystemEventStream(jsenv.baseURL + '/filesystem-events.js');
 	});
 }
