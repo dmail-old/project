@@ -1,56 +1,64 @@
-jsenv.need(function setupBase(){
-	jsenv.mode = jsenv.mode || 'install';
-	jsenv.baseURL = jsenv.baseURL || './';
-	jsenv.mainModule = './main.js';
-});
-jsenv.need('./config-project.js');
-jsenv.need('./config-local.js');
+function setup(){
+	jsenv.watch = true;
 
-if( jsenv.server ){
-	jsenv.aliases['http-event-stream'] = './lib/http-event-stream.js';
-	jsenv.aliases['http-event-source'] = './lib/http-event-source.js';
+	jsenv.need(function setupBase(){
+		jsenv.mode = jsenv.mode || 'install';
 
-	jsenv.need('http-event-stream');
-	jsenv.need('http-event-source');
-	jsenv.need(function setupDev(){
-		jsenv.onerror = function(error){
-			// because event source is connected, error occuring in watched files does not kill the process
-			// but the promise is still rejected so nothing is supposed to happen
-			// this way the process can still ask to restart
-			if( error.filename && (error.name === 'SyntaxError' || error.name === 'ReferenceError') && this.findModuleByURL(error.filename) ){
-				var stack = error.stack;
-
-				/*
-				stack = stack.replace(/\((.+):([0-9]+):([0-9]+)\)/g, function(match, fileName, lineNumber, columnNumber){
-					var module = jsenv.findModuleBy('address', fileName);
-
-					if( module ){
-						return '(' + fileName + ':' + (parseInt(lineNumber) - 2) + ':' + columnNumber + ')';
-					}
-
-					return match;
-				});
-				*/
-
-				console.error(stack);
+		// mainModule must tell his extension (.js) in order to know the default extension of child modules
+		if( jsenv.platform.type === 'process' ){
+			if( process.argv.length > 1 ){
+				jsenv.baseURL = process.argv[2] + '/';
 			}
-			else{
-				throw error;
-			}
-		};
-
-		var url = jsenv.baseURL + '/filesystem-events.js';
-		var HttpEventSource = jsenv.require('./lib/http-event-source.js');
-		var source = new HttpEventSource(url);
-
-		source.on('change', function(e){
-			var file = e.data;
-
-			// le fichier modifié est bien un module que l'on utilise
-			if( jsenv.loader.has(file) ){
-				console.log(file, 'module modified');
-				jsenv.platform.restart();
-			}
-		});
+			jsenv.mainModule = './app/server/server.js';
+		}
+		else{
+			jsenv.mainModule = './app/client/client.js';
+		}
 	});
+	jsenv.need('./config-project.js');
+	jsenv.need('./config-local.js');
+
+	jsenv.observeModules = function(){
+		jsenv.include('./modules/http-event-source.js').then(function(HttpEventSource){
+			var url = jsenv.baseURL + '/filesystem-events.js';
+			var source = new HttpEventSource(url);
+
+			//console.log('connecting to', url);
+
+			source.on('change', function(e){
+				var file = e.data, module;
+
+				file = jsenv.loader.normalize(file);
+				// le fichier modifié est bien un module que l'on utilise
+				module = jsenv.findModuleByURL(file);
+
+				//console.log('trying to find', file);
+
+				if( module ){
+					jsenv.onmodulechange(module);
+				}
+			});
+			source.on('error', function(e){
+				console.log('event source connection error');
+			});
+		});
+	};
+
+	// todo
+	jsenv.unobserveModules = function(){
+
+	};
+}
+
+if( typeof process !== 'undefined' ){
+	require('jsenv');
+	setup();
+}
+else{
+	var script = document.createElement('script');
+
+	script.src = 'node_modules/jsenv/index.js';
+	script.type = 'text/javascript';
+	script.onload = setup;
+	document.head.appendChild(script);
 }

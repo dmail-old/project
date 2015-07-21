@@ -1,5 +1,6 @@
 var path = require('path');
 var url = require('url');
+var open = require('open');
 var Server = require('../lib/server');
 var sse = require('../lib/sse');
 var fileStorage = require('jsenv/storages/storage-file');
@@ -7,6 +8,7 @@ var Work = require('../lib/work');
 var fileWatcher = require('../lib/fs-watch');
 
 var serverURL = 'http://127.0.0.1:8081';
+var openBrowser = !false;
 
 function createFileSystemServer(serverUrl){
 	var cwd = process.cwd();
@@ -65,29 +67,42 @@ function createFileSystemServer(serverUrl){
 		else if( clientRequest.method === 'GET' || clientRequest.method === 'HEAD' ){
 			var filePath = path.resolve(cwd, '.' + url.parse(clientRequest.url).pathname);
 
-			responsePromise = fileStorage.createResponsePromiseForGet({
-				url: filePath,
-				method: clientRequest.method,
-				headers: clientRequest.headers
-			}).then(function(responseProperties){
-				// watch only if file exists
-				if( responseProperties.status === 200 || responseProperties.status === 304 ){
-					fileWatcher.watch(filePath, function(filePath){
-						//console.log('file modified:', filePath);
-						var fileName = path.relative(process.cwd(), filePath);
+			// unauthorized
+			if( filePath.indexOf(cwd + '/app/server') === 0 ){
+				responsePromise = Promise.resolve({
+					status: 403
+				});
+			}
+			else{
+				responsePromise = fileStorage.createResponsePromiseForGet({
+					url: filePath,
+					method: clientRequest.method,
+					headers: clientRequest.headers
+				}).then(function(responseProperties){
+					// watch only if file exists
+					if( responseProperties.status === 200 || responseProperties.status === 304 ){
+						//console.log('watching', filePath);
 
-						if( fileName[0] != '/' ) fileName = '/' + fileName;
-						if( fileName[0] != '.' ) fileName = '.' + fileName;
+						fileWatcher.watch(filePath, function(filePath){
+							//console.log('file modified:', filePath);
+							var fileName = path.relative(process.cwd(), filePath);
 
-						filesystemRoom.sendEvent('change', fileName);
-					});
+							fileName = fileName.replace(/\\/g, '/');
+							if( fileName[0] != '/' ) fileName = '/' + fileName;
+							if( fileName[0] != '.' ) fileName = '.' + fileName;
 
-					// chrome is caching file
-					responseProperties.headers['cache-control'] = 'no-cache';
-				}
+							//console.log(fileName, 'was modified');
 
-				return responseProperties;
-			});
+							filesystemRoom.sendEvent('change', fileName);
+						});
+
+						// chrome is caching file
+						responseProperties.headers['cache-control'] = 'no-cache';
+					}
+
+					return responseProperties;
+				});
+			}
 		}
 		else if( clientRequest.method === 'POST' ){
 			responsePromise = fileStorage.createResponsePromiseForSet({
@@ -140,15 +155,19 @@ function createFileSystemServer(serverUrl){
 }
 
 var server = createFileSystemServer(serverURL);
-var work = Work.create('./index-process.js', {
-	// tell the baseURL is the serverURL
-	args: {
-		baseURL: serverURL
-	}
+var work = Work.create('./index.js', {
+	args: [serverURL]
 });
 
 server.on('open', function(){
 	work.start(server.close.bind(server));
+
+	// faut un ficher de config pour décider si on ouver un navigateur
+	// pour spécifier l'url du serveur aussi
+
+	if( openBrowser ){
+		open(serverURL + '/index.html');
+	}
 });
 
 server.on('close', function(){
