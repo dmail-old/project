@@ -6,9 +6,10 @@ var sse = require('../lib/sse');
 var fileStorage = require('jsenv/storages/storage-file');
 var Work = require('../lib/work');
 var fileWatcher = require('../lib/fs-watch');
+var config = JSON.parse(require('fs').readFileSync('./config.json'));
 
-var serverURL = 'http://127.0.0.1:8081';
-var openBrowser = !false;
+var serverURL = config['server-url'];
+var openBrowser = config['open-browser'];
 
 function createFileSystemServer(serverUrl){
 	var cwd = process.cwd();

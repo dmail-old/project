@@ -1,0 +1,8 @@
+[
+	{
+		"name": "argv",
+		"main": "index.js",
+		"source": "modules/dmail/argv",
+		"origin": "//github.com/dmail/argv"
+	}
+]

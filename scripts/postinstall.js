@@ -1,3 +1,4 @@
+var config = JSON.parse(require('fs').readFileSync('./config.json'));
 var filesystem = require('jsenv/utils/filesystem');
 var hasdir = require('jsenv/utils/has-dir');
 var hasfile = require('jsenv/utils/has-file');
@@ -5,6 +6,7 @@ var symlink = require('jsenv/utils/symlink');
 var exec = require('jsenv/utils/exec');
 var mkdirto = require('jsenv/utils/mkdir-to');
 var path = require('path');
+var url = require('url');
 var cwd = process.cwd();
 
 function getLocation(location){
@@ -30,9 +32,9 @@ function createFile(location, content){
 	});
 }
 
-var modules = []; // récup les modules, ou les mettre ici et créer ou réécrire le fichier project.env.js
 var projectEnv = getLocation('./config-project.js');
 var localEnv = getLocation('./config-local.js');
+var cloneDestination = config['gitclone-path'];
 var promise = Promise.resolve();
 
 promise = promise.then(function(){
@@ -43,27 +45,41 @@ promise = promise.then(function(){
 	return createFile(localEnv, '');
 });
 
-promise = promise.then(function(){
-	return Promise.all(
-		modules.map(function(name){
-			var from = 'https://github.com/dmail/' + name;
-			var to = '../dmail/' + name;
-			var link = 'modules/dmail/' + name;
+if( config['gitclone-path'] ){
+	var cloneDestination = getLocation(config['gitclone-path']);
+	var registry = config['registry-url'];
 
-			to = getLocation(to);
+	promise = promise.then(function(){
+		return filesystem('readFile', registry).then(JSON.parse);
+	});
 
-			return hasdir(to).then(function(has){
-				if( has ){
-					console.log(name, 'already cloned');
-					return;
-				}
-				return cloneRepo(from, to);
-			}).then(function(){
-				return symlink(to, getLocation(link));
-			});
-		})
-	);
-});
+	// à ne pas faire en mode production, seulement en mode dev
+	promise = promise.then(function(modules){
+		return Promise.all(
+			modules.map(function(module){
+				var origin = url.parse(module.origin);
+
+				// for dmail modules from github
+				if( origin.hostname !== 'github.com' || origin.pathname.indexOf('/dmail/') !== 0 ) return;
+
+				var name = module.name;
+				var from = module.origin;
+				var to = cloneDestination + '/' + origin.pathname.slice('/dmail/'.length);
+				var link = module.source;
+
+				return hasdir(to).then(function(has){
+					if( has ){
+						console.log(name, 'already cloned');
+						return;
+					}
+					return cloneRepo(from, to);
+				}).then(function(){
+					return symlink(to, getLocation(link));
+				});
+			})
+		);
+	});
+}
 
 promise.catch(function(error){
 	setImmediate(function(){
