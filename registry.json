@@ -1,18 +1,10 @@
 {
-	"author": "dmail",
-
-	"types": {
-		"dmail": {
-			"source": "modules/dmail/{name}",
-			"origin": "//github.com/dmail/{name}"
-		}
-	},
-
 	"modules": [
 		{
 			"name": "argv",
 			"main": "index.js",
-			"type": "dmail"
+			"source": "modules/dmail/argv",
+			"origin": "//github.com/dmail/argv"
 		}
 	]
 }

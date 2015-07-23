@@ -1,4 +1,3 @@
-var config = JSON.parse(require('fs').readFileSync('./config.json'));
 var filesystem = require('jsenv/utils/filesystem');
 var hasdir = require('jsenv/utils/has-dir');
 var hasfile = require('jsenv/utils/has-file');
@@ -27,23 +26,25 @@ function cloneRepo(repositoryURL, directory){
 }
 
 function createFile(location, content){
-	return hasfile(projectEnv).then(function(hasFile){
-		if( !hasFile ) return filesystem('write', projectEnv, '');
+	return hasfile(location).then(function(hasFile){
+		if( !hasFile ) return filesystem('write', location, '');
 	});
 }
 
-var projectEnv = getLocation('./config-project.js');
-var localEnv = getLocation('./config-local.js');
+var projectConfig = getLocation('./config.json');
+var localConfig = getLocation('./config-local.json');
+
+promise = promise.then(function(){
+	return createFile(projectConfig, '');
+});
+
+promise = promise.then(function(){
+	return createFile(localConfig, '');
+});
+
+var config = JSON.parse(require('fs').readFileSync('./config.json'));
 var cloneDestination = config['gitclone-path'];
 var promise = Promise.resolve();
-
-promise = promise.then(function(){
-	return createFile(projectEnv, '');
-});
-
-promise = promise.then(function(){
-	return createFile(localEnv, '');
-});
 
 if( config['gitclone-path'] ){
 	var cloneDestination = getLocation(config['gitclone-path']);

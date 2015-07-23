@@ -15,20 +15,25 @@ function setup(){
 			jsenv.mainModule = './app/client/client.js';
 		}
 	});
-	jsenv.need('./config-project.js');
-	jsenv.need('./config-local.js');
 
 	jsenv.ready(function(){
 		return jsenv.include('./modules/media-json.js').then(function(){
 			return jsenv.include('./config.json');
+			// got global config
 		}).then(function(config){
-			console.log(config);
-			return jsenv.include(config['registry-url']);
+			jsenv.config = config;
+			return jsenv.include('./config-local.json');
+			// got local config
+		}).then(function(localConfig){
+			Object.assign(jsenv.config, localConfig);
+			return jsenv.include(jsenv.config['registry-url']);
 		}).then(function(registry){
+			// transform registry into rules
+			registry.modules.forEach(function(module){
+				jsenv.rule(module.name, Object.assign({}, module));
+			});
+
 			console.log(registry);
-			// i got the registry
-		}).then(function(){
-			// now I can start the app
 		});
 	});
 
