@@ -59,18 +59,24 @@ if( config['gitclone-path'] ){
 			modules.map(function(module){
 				var origin = url.parse(module.origin);
 
-				// for dmail modules from github
-				if( origin.hostname !== 'github.com' || origin.pathname.indexOf('/dmail/') !== 0 ) return;
+				// for modules from github
+				if( origin.hostname !== 'github.com' ) return;
 
 				var name = module.name;
 				var from = module.origin;
-				var to = cloneDestination + '/' + origin.pathname.slice('/dmail/'.length);
+				var to = cloneDestination + origin.pathname;
 				var link = module.source;
 
 				return hasdir(to).then(function(has){
 					if( has ){
-						console.log(name, 'already cloned');
-						return;
+						return hasdir(to + '/.git').then(function(hasGit){
+							if( hasGit ){
+								console.log('git clone', from, 'aborted : already cloned');
+							}
+							else{
+								console.log('git clone', from, 'aborted : directory exists');
+							}
+						});
 					}
 					return cloneRepo(from, to);
 				}).then(function(){

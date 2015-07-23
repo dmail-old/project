@@ -1,6 +1,7 @@
 modules/dmail/
 node_modules/*
 !node_modules/.hooks
+.env
 
 # Windows image file caches
 Thumbs.db

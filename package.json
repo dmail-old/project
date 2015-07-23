@@ -4,7 +4,8 @@
 	"description": "Project sample using jsenv",
 	"dependencies": {
 		"jsenv": "git+https://github.com/dmail/jsenv",
-		"open": "*"
+		"open": "*",
+		"node-env-file": "*"
 	},
 	"scripts": {
 		"preinstall": "node scripts/preinstall.js",

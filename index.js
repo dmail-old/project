@@ -18,6 +18,20 @@ function setup(){
 	jsenv.need('./config-project.js');
 	jsenv.need('./config-local.js');
 
+	jsenv.ready(function(){
+		return jsenv.include('./modules/media-json.js').then(function(){
+			return jsenv.include('./config.json');
+		}).then(function(config){
+			console.log(config);
+			return jsenv.include(config['registry-url']);
+		}).then(function(registry){
+			console.log(registry);
+			// i got the registry
+		}).then(function(){
+			// now I can start the app
+		});
+	});
+
 	jsenv.observeModules = function(){
 		jsenv.include('./modules/http-event-source.js').then(function(HttpEventSource){
 			var url = jsenv.baseURL + '/filesystem-events.js';

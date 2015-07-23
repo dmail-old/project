@@ -7,6 +7,9 @@ var fileStorage = require('jsenv/storages/storage-file');
 var Work = require('../lib/work');
 var fileWatcher = require('../lib/fs-watch');
 var config = JSON.parse(require('fs').readFileSync('./config.json'));
+var env = require('node-env-file');
+
+env(process.cwd() + '/.env');
 
 var serverURL = config['server-url'];
 var openBrowser = config['open-browser'];
